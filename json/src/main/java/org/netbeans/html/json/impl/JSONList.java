@@ -41,6 +41,7 @@ public final class JSONList<T> extends SimpleList<T> {
         this.index = changeIndex;
     }
     
+    @SuppressWarnings("unchecked")
     public void init(Object values) {
         int len;
         if (values == null || (len = Array.getLength(values)) == 0) {
@@ -51,6 +52,8 @@ public final class JSONList<T> extends SimpleList<T> {
             super.add((T)data);
         }
     }
+
+    @SuppressWarnings("unchecked")
     public static <T> void init(Collection<T> to, Object values) {
         int len;
         if (values == null || (len = Array.getLength(values)) == 0) {

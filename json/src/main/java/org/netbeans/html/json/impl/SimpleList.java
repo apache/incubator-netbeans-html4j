@@ -38,6 +38,8 @@ public class SimpleList<E> implements List<E> {
         size = data.length;
     }
 
+    @SafeVarargs
+    @SuppressWarnings("varargs")
     public static <T> List<T> asList(T... arr) {
         return new SimpleList<T>(arr);
     }
@@ -89,6 +91,7 @@ public class SimpleList<E> implements List<E> {
         return toArrayImpl(a, 0, size);
     }
 
+    @SuppressWarnings("unchecked")
     final <T> T[] toArrayImpl(T[] a, int from, int to) {
         if (a.length < to - from) {
             a = newArr(a, to - from);
@@ -191,6 +194,7 @@ public class SimpleList<E> implements List<E> {
         sortImpl(c, 0, size);
     }
 
+    @SuppressWarnings("unchecked")
     final void sortImpl(Comparator<? super E> c, int from, int to) {
         for (int i = from; i < to; i++) {
             Object min = arr[i];
@@ -227,6 +231,7 @@ public class SimpleList<E> implements List<E> {
         size -= to;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E get(int index) {
         checkAccess(index);
@@ -264,6 +269,7 @@ public class SimpleList<E> implements List<E> {
         this.size = ensureAccess(newSize);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E set(int index, E element) {
         checkAccess(index);
@@ -272,11 +278,13 @@ public class SimpleList<E> implements List<E> {
         return prev;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void add(int index, E element) {
         addImpl(index, asList(element));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public E remove(int index) {
         checkAccess(index);
@@ -339,6 +347,7 @@ public class SimpleList<E> implements List<E> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static <T> T[] newArr(T[] a, int size) {
         return (T[]) Array.newInstance(a.getClass().getComponentType(), size);
     }
@@ -613,6 +622,7 @@ public class SimpleList<E> implements List<E> {
             return at < max + add;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public E next() {
             if (at == max + add) {
@@ -627,6 +637,7 @@ public class SimpleList<E> implements List<E> {
             return at > min;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public E previous() {
             if (at == min) {

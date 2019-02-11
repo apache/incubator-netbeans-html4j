@@ -264,10 +264,17 @@ org.netbeans.html.boot.impl:org.netbeans.html.boot.fx:org.netbeans.html.context.
               <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.6.0</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                    <compilerArgs>
+                        <compilerArgument>-Xlint:-options</compilerArgument>
+                        <compilerArgument>-Xlint:unchecked</compilerArgument>
+                    </compilerArgs>
+                    <showDeprecation>true</showDeprecation>
+                    <showWarnings>true</showWarnings>
+                    <failOnWarning>true</failOnWarning>
                 </configuration>
               </plugin>
               <plugin>

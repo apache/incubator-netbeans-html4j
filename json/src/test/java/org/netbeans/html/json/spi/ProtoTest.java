@@ -83,6 +83,7 @@ public class ProtoTest implements Technology.BatchInit<Object> {
     }
 
     @Override
+    @Deprecated
     public void runSafe(Runnable r) {
         throw new UnsupportedOperationException("runSafe");
     }

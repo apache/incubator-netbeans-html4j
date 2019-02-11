@@ -115,7 +115,7 @@ public abstract class FunctionBinding {
         @Override
         public FunctionBinding weak() {
             if (weakSupported) {
-                return new Weak(model, name, index, access);
+                return new Weak<M>(model, name, index, access);
             } else {
                 return this;
             }

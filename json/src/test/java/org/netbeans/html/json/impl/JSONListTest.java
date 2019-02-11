@@ -157,7 +157,7 @@ public class JSONListTest implements Technology<Object> {
         List<Integer> vals = new ArrayList<Integer>();
         vals.add(12);
         vals.add(30);
-        ((JSONList)p.getAge()).fastReplace(vals);
+        ((JSONList<Integer>)p.getAge()).fastReplace(vals);
 
         assertEquals(changed.size(), 1, "One change");
         assertEquals(changed.get(0), "age", "One change");
@@ -206,7 +206,8 @@ public class JSONListTest implements Technology<Object> {
     }
 
     @Override
+    @Deprecated
     public void runSafe(Runnable r) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

@@ -211,8 +211,9 @@ public class DependsChangeTest {
         }
 
         @Override
+        @Deprecated
         public void runSafe(Runnable r) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet.");
         }
     }
 

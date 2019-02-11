@@ -383,6 +383,7 @@ public final class JSON {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <Model> Model bindTo(Model model, BrwsrCtx c) {
         Proto.Type<Model> from = (Proto.Type<Model>) findType(model.getClass());
         if (from == null) {
@@ -501,6 +502,7 @@ public final class JSON {
             throw new IOException("Not supported");
         }
 
+        @Deprecated
         @Override
         public void runSafe(Runnable r) {
             r.run();

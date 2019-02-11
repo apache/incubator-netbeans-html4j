@@ -47,13 +47,13 @@ import org.netbeans.html.json.impl.SimpleList;
  */
 public final class Proto {
     private final Object obj;
-    private final Type type;
+    private final Type<?> type;
     private final net.java.html.BrwsrCtx context;
     private org.netbeans.html.json.impl.Bindings ko;
     private Observers observers;
     private Observers.Usages usages;
 
-    Proto(Object obj, Type type, BrwsrCtx context) {
+    Proto(Object obj, Type<?> type, BrwsrCtx context) {
         this.obj = obj;
         this.type = type;
         this.context = context;
@@ -222,7 +222,7 @@ public final class Proto {
             @Override
             public void run() {
                 try {
-                    type.call(obj, index, args, null);
+                    type.callRaw(obj, index, args, null);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -339,12 +339,12 @@ public final class Proto {
         class Rcvr extends RcvrJSON {
             @Override
             protected void onMessage(MsgEvnt msg) {
-                type.onMessage(obj, index, 1, msg.getValues(), params);
+                type.onMessageRaw(obj, index, 1, msg.getValues(), params);
             }
 
             @Override
             protected void onError(MsgEvnt msg) {
-                type.onMessage(obj, index, 2, msg.getException(), params);
+                type.onMessageRaw(obj, index, 2, msg.getException(), params);
             }
         }
         JSONCall call = PropertyBindingAccessor.createCall(
@@ -367,22 +367,22 @@ public final class Proto {
         class WSrcvr extends RcvrJSON {
             @Override
             protected void onError(MsgEvnt msg) {
-                type.onMessage(obj, index, 2, msg.getException());
+                type.onMessageRaw(obj, index, 2, msg.getException());
             }
 
             @Override
             protected void onMessage(MsgEvnt msg) {
-                type.onMessage(obj, index, 1, msg.getValues());
+                type.onMessageRaw(obj, index, 1, msg.getValues());
             }
 
             @Override
             protected void onClose(MsgEvnt msg) {
-                type.onMessage(obj, index, 3, null);
+                type.onMessageRaw(obj, index, 3, null);
             }
 
             @Override
             protected void onOpen(MsgEvnt msg) {
-                type.onMessage(obj, index, 0, null);
+                type.onMessageRaw(obj, index, 0, null);
             }
         }
         WS ws = WS.create(JSON.findWSTransfer(context), new WSrcvr());
@@ -486,19 +486,19 @@ public final class Proto {
 
     final Bindings initBindings(Object originalObject) {
         if (ko == null) {
-            Bindings b = Bindings.apply(context);
+            Bindings<?> b = Bindings.apply(context);
             PropertyBinding[] pb = new PropertyBinding[type.properties.size()];
             for (int i = 0; i < pb.length; i++) {
                 final PropertyInfo info = (PropertyInfo) type.properties.get(i);
                 if (info != null) {
-                    pb[i] = b.registerProperty(info.name, i, obj, type, info.type);
+                    pb[i] = type.registerProperty(b, info.name, i, obj, info.type);
                 }
             }
             FunctionBinding[] fb = new FunctionBinding[type.functions.size()];
             for (int i = 0; i < fb.length; i++) {
                 final String fnName = (String) type.functions.get(i);
                 if (fnName != null) {
-                    fb[i] = FunctionBinding.registerFunction(fnName, i, obj, type);
+                    fb[i] = type.registerFunction(fnName, i, obj);
                 }
             }
             ko = b;
@@ -512,7 +512,7 @@ public final class Proto {
     }
 
     final void onChange(int index) {
-        type.onChange(obj, index);
+        type.onChangeRaw(obj, index);
     }
 
     final Observers observers(boolean create) {
@@ -654,6 +654,10 @@ public final class Proto {
         protected abstract void call(Model model, int index, Object data, Object event)
         throws Exception;
 
+        final void callRaw(Object model, int index, Object data, Object event) throws Exception {
+            call(clazz.cast(model), index, data, event);
+        }
+
         /** Re-binds the model object to new browser context.
          *
          * @param model the instance of {@link Model model class}
@@ -677,6 +681,10 @@ public final class Proto {
          * @param index the index of the property during registration
          */
         protected abstract void onChange(Model model, int index);
+
+        final void onChangeRaw(Object model, int index) {
+            onChange(clazz.cast(model), index);
+        }
 
         /** Finds out if there is an associated proto-object for given
          * object.
@@ -718,6 +726,10 @@ public final class Proto {
          */
         protected void onMessage(Model model, int index, int type, Object data, Object[] params) {
             onMessage(model, index, type, data);
+        }
+
+        final void onMessageRaw(Object model, int index, int type, Object data, Object... params) {
+            onMessage(clazz.cast(model), index, type, data, params);
         }
 
         //
@@ -868,9 +880,14 @@ public final class Proto {
                 val = val instanceof Number ? ((Number) val).floatValue() : Float.NaN;
             }
             if (type.isEnum() && val instanceof String) {
-                val = Enum.valueOf(type.asSubclass(Enum.class), (String)val);
+                val = enumByName(type, (String)val);
             }
             return type.cast(val);
+        }
+
+        @SuppressWarnings("unchecked")
+        private static Object enumByName(Class<?> enumType, String name) {
+            return Enum.valueOf(enumType.asSubclass(Enum.class), name);
         }
 
         /** Special dealing with array &amp; {@link List} values. This method
@@ -885,6 +902,7 @@ public final class Proto {
          *   value is not an array it is wrapped into array with only element
          * @since 1.0
          */
+        @SuppressWarnings("unchecked")
         public final <T> void replaceValue(Collection<? super T> arr, Class<T> type, Object value) {
             List<T> tmp = Models.asList();
             if (value instanceof Object[]) {
@@ -927,12 +945,20 @@ public final class Proto {
                 tmp.add(extractValue(type, value));
             }
             if (arr instanceof JSONList) {
-                JSONList jsList = (JSONList) arr;
+                JSONList<T> jsList = (JSONList<T>) arr;
                 jsList.fastReplace(tmp);
             } else {
                 arr.clear();
                 arr.addAll(tmp);
             }
+        }
+
+        final PropertyBinding registerProperty(Bindings<?> b, String name, int index, Object obj, byte type) {
+            return b.registerProperty(name, index, clazz.cast(obj), this, type);
+        }
+
+        final FunctionBinding registerFunction(String fnName, int i, Object obj) {
+            return FunctionBinding.registerFunction(fnName, i, clazz.cast(obj), this);
         }
     }
 }

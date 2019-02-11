@@ -73,7 +73,7 @@ public abstract class PropertyBinding {
             @Override
             protected <M> PropertyBinding newBinding(
                 Proto.Type<M> access, Bindings<?> bindings, String name, int index, M model, byte propertyType) {
-                return new Impl(model, bindings, name, index, access, propertyType);
+                return new Impl<M>(model, bindings, name, index, access, propertyType);
             }
         };
         boolean weakOK;
@@ -199,7 +199,7 @@ public abstract class PropertyBinding {
         @Override
         public PropertyBinding weak() {
             if (weakSupported) {
-                return new Weak(model, bindings, name, index, access, propertyType);
+                return new Weak<M>(model, bindings, name, index, access, propertyType);
             } else {
                 return this;
             }

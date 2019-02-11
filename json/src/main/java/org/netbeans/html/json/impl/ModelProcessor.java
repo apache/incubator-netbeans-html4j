@@ -2034,6 +2034,7 @@ public final class ModelProcessor extends AbstractProcessor {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     static List<? extends Object> getAnnoValues(ProcessingEnvironment pe, Element e, AnnotationMirror am) {
         try {
             Class<?> trees = Class.forName("com.sun.tools.javac.api.JavacTrees");
@@ -2107,6 +2108,7 @@ public final class ModelProcessor extends AbstractProcessor {
         }
 
 
+        @SuppressWarnings("unchecked")
         static Prprt[] wrap(ProcessingEnvironment pe, Element e, Property[] arr) {
             if (arr.length == 0) {
                 return new Prprt[0];
