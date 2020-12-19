@@ -25,6 +25,9 @@ import java.lang.reflect.Method;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 import org.netbeans.html.boot.spi.Fn;
+import org.netbeans.html.presenters.spi.ProtoPresenter;
+import org.netbeans.html.presenters.spi.test.Testing.Holder;
+import static org.testng.Assert.assertNotNull;
 import org.testng.IHookCallBack;
 import org.testng.IHookable;
 import org.testng.ITest;
@@ -77,10 +80,12 @@ public final class Case implements ITest, IHookable, Runnable {
     public void run() {
         Closeable c = Fn.activate(p);
         try {
-            if (p instanceof Testing) {
-                Testing tp = (Testing) p;
-                tp.beforeTest(m.getDeclaringClass());
-            }
+            ProtoPresenter pp = (ProtoPresenter) p;
+            Holder h = pp.lookup(Holder.class);
+            assertNotNull(h, "Testing found for " + p);
+            Testing tp = h.get();
+            assertNotNull(tp, "Testing found for " + p);
+            tp.beforeTest(m.getDeclaringClass());
             if (inst == null) {
                 inst = m.getDeclaringClass().newInstance();
             }
@@ -109,5 +114,5 @@ public final class Case implements ITest, IHookable, Runnable {
     public void run(IHookCallBack ihcb, ITestResult itr) {
         ihcb.runTestMethod(itr);
     }
-    
+
 }

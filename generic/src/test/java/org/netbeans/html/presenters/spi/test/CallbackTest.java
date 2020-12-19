@@ -18,10 +18,10 @@
  */
 package org.netbeans.html.presenters.spi.test;
 
-import java.lang.reflect.Method;
 import java.util.logging.Level;
-import javax.script.ScriptException;
+import org.netbeans.html.presenters.spi.test.Testing.Synchronized;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Factory;
 
@@ -35,28 +35,47 @@ public class CallbackTest {
     }
     
     
-    private static final class CBP extends Testing {
+    private static final class CBP extends Synchronized {
+        ThreadLocal<Boolean> initializing = new ThreadLocal<>();
+        int exp = 0;
 
         @Override
         protected void loadJS(String js) {
-            dispatch(new Runnable () {
-                @Override
-                public void run() {
+            if (!initializing.get()) {
+                Throwable[] arr = { null };
+                dispatch(() -> {
                     try {
-                        Object res = eng.eval("if (this.counter) this.counter()");
+                        Object res = eng.eval("counter()");
                         LOG.log(Level.FINE, "counter res: {0}", res);
-                    } catch (ScriptException ex) {
-                        LOG.log(Level.SEVERE, null, ex);
+                        if (res instanceof Number) {
+                            assertEquals(((Number) res).intValue(), ++exp, "Counter has been incremented");
+                        } else {
+                            fail("Expecting number: " + res);
+                        }
+                    } catch (Throwable ex) {
+                        arr[0] = ex;
                     }
+                });
+                if (arr[0] != null) {
+                    if (arr[0] instanceof Error) {
+                        throw (Error)arr[0];
+                    }
+                    if (arr[0] instanceof RuntimeException) {
+                        throw (RuntimeException)arr[0];
+                    }
+                    throw new AssertionError(arr[0]);
                 }
-            });
+            }
             super.loadJS(js);
         }
 
         @Override void beforeTest(Class<?> testClass) throws Exception {
-            Class<?> cntr = testClass.getClassLoader().loadClass(Counter.class.getName());
-            Method rc = cntr.getMethod("registerCounter");
-            rc.invoke(null);
+            try {
+                initializing.set(true);
+                Counter.registerCounter(exp);
+            } finally {
+                initializing.set(false);
+            }
         }
         
     }

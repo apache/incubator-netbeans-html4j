@@ -19,29 +19,36 @@
 package org.netbeans.html.presenters.spi.test;
 
 import net.java.html.js.JavaScriptBody;
+import static org.testng.Assert.assertEquals;
 
 public final class Counter {
     static int calls;
     static int callbacks;
 
-    static int count() {
+    static int count(Object setTo) {
+        if (setTo instanceof Number) {
+            callbacks = ((Number) setTo).intValue();
+            return callbacks;
+        }
         return ++callbacks;
     }
     
-    public static final void registerCounter() {
-        if (rCounter()) {
-            callbacks = 0;
-        }
+    public static final void registerCounter(int setTo) {
+        callbacks = -1;
+        rCounter(setTo);
+        assertEquals(callbacks, setTo, "Initialized to zero");
     }
 
-    @JavaScriptBody(args = {}, javacall = true, body
-            = "if (!this.counter) {\n"
-            + "  this.counter = function() { return @org.netbeans.html.presenters.spi.test.Counter::count()(); };\n"
-            + "  return true;\n"
-            + "} else {\n"
-            + "  return false;\n"
+    @JavaScriptBody(args = { "param" }, javacall = true, body
+            = "\n "
+            + "var thiz = (0 || eval('this'));\n"
+            + "if (!thiz.counter) {\n"
+            + "  thiz.counter = function(p) {\n"
+            + "    return @org.netbeans.html.presenters.spi.test.Counter::count(Ljava/lang/Object;)(p);\n"
+            + "  };\n"
             + "}\n"
+            + "thiz.counter(param);\n"
     )
-    private static native boolean rCounter();
+    private static native void rCounter(Object param);
     
 }

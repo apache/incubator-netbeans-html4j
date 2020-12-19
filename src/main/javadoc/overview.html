@@ -163,6 +163,17 @@ $ mvn -f client/pom.xml process-classes exec:exec
             vm.loadClass('org.apidesign.demo.minesweeper.MainBrwsr');
         </script>
         
+        <h3>New in version 1.7.5</h3>
+        <p>
+            As of
+            <a target="_blank" href="https://github.com/apache/netbeans-html4j/pull/26">PR #26</a>
+            the HTTP server used by the
+            {@link org.netbeans.html.presenters.browser browser presenter}
+            is written from scratch and is single-threaded. That seems more
+            suitable for the simple use-case of Java to JavaScript virtual
+            machine communication.
+        </p>
+
         <h3>New in version 1.7</h3>
         <p>
             New modules are provided since
@@ -220,6 +231,38 @@ $ mvn -f client/pom.xml process-classes exec:exec
             <a target="_blank" href="https://issues.apache.org/jira/browse/NETBEANS-621">#621</a>.
         </p>
 
+        <h3>What's new in older versions?</h3>
+
+        <p>
+        Click the
+        <a href="#" onclick="return showHistoric()">link</a>
+        to view even more
+        <a href="#" onclick="return showHistoric()">historic changes</a>...
+        </p>
+
+        <a name="historic.changes"></a>
+        <div id="historic.changes">
+            <script>
+            (function() {
+                var visible;
+                function showHistoric(show) {
+                    var e = document.getElementById("historic.changes");
+                    if (show === undefined) {
+                        show = !visible;
+                    }
+                    if (show) {
+                        e.style.display="block";
+                    } else {
+                        e.style.display="none";
+                    }
+                    visible = show;
+                    return false;
+                }
+                showHistoric(false);
+                this.showHistoric = showHistoric;
+            })()
+            </script>
+
         <h3>New in version 1.5.1</h3>
 
         <p>
@@ -261,38 +304,6 @@ $ mvn -f client/pom.xml process-classes exec:exec
         Simplifying {@link org.netbeans.html.json.tck.KnockoutTCK} to avoid
         usage of {@link java.net.URI}, etc.
         </p>
-
-        <h3>What's new in older versions?</h3>
-
-        <p>
-        Click the
-        <a href="#" onclick="return showHistoric()">link</a>
-        to view even more
-        <a href="#" onclick="return showHistoric()">historic changes</a>...
-        </p>
-
-        <a name="historic.changes"></a>
-        <div id="historic.changes">
-            <script>
-            (function() {
-                var visible;
-                function showHistoric(show) {
-                    var e = document.getElementById("historic.changes");
-                    if (show === undefined) {
-                        show = !visible;
-                    }
-                    if (show) {
-                        e.style.display="block";
-                    } else {
-                        e.style.display="none";
-                    }
-                    visible = show;
-                    return false;
-                }
-                showHistoric(false);
-                this.showHistoric = showHistoric;
-            })()
-            </script>
 
         <h3>New features in version 1.4</h3>
 

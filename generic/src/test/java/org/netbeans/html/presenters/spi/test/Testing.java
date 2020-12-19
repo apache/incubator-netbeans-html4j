@@ -55,6 +55,7 @@ class Testing {
             .displayer(this::displayPage)
             .preparator(this::callbackFn, true)
             .logger(this::log)
+            .register(new Holder())
             .build();
 
         ScriptEngineManager sem = new ScriptEngineManager();
@@ -173,4 +174,10 @@ class Testing {
         void beforeTest(Class<?> declaringClass) throws Exception {
         }
     } // end of Synchronized
+
+    final class Holder {
+        Testing get() {
+            return Testing.this;
+        }
+    }
 }
