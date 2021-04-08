@@ -33,7 +33,7 @@
   </parent>
   <properties>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <netbeans.version>RELEASE122</netbeans.version>
+      <netbeans.version>RELEASE123</netbeans.version>
       <graalvm.version>20.3.0</graalvm.version>
       <grizzly.version>2.3.8</grizzly.version>
       <license>COPYING</license>
@@ -369,7 +369,7 @@ org.netbeans.html.boot.impl:org.netbeans.html.boot.fx:org.netbeans.html.context.
                     </execution>
                 </executions>
                 <configuration>
-                    <releaseVersion>1.7</releaseVersion>
+                    <releaseVersion>1.7.1</releaseVersion>
                 </configuration>
             </plugin>
           </plugins>
